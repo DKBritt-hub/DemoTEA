@@ -22,19 +22,16 @@ from publish import save_and_publish          # noqa: E402
 st.set_page_config(page_title="Demo Co. Membrane TEA", layout="wide",
                    initial_sidebar_state="expanded")
 
-# TEMP tuning knob: a slider to dial in the pin-glyph horizontal position live, then we lock the
-# value and remove this. The emoji is centered in a stretched button; right-padding shifts the
-# centered glyph LEFT (0% = original centre, 50% = far left). Scoped to the tack buttons only.
-_pinpad = st.sidebar.slider("🔧 Pin position (temp) — right-pad %", 0, 60, 25, 1,
-                            help="Drag until the pin icons look centred, tell me the value, then "
-                                 "it gets locked in and this slider is removed. Higher = further left.")
+# Pin (tack) button glyph: zero the button's horizontal padding so the emoji sits centred in the
+# box. Streamlit's default asymmetric padding made it read as off-centre; locked at 0 right-pad
+# after live tuning. Scoped to the tack buttons only (their st-key-tack_* wrappers).
 st.markdown(
-    f"""<style>
-    div[class*="st-key-tack_"] button {{
+    """<style>
+    div[class*="st-key-tack_"] button {
         padding-left: 0 !important;
-        padding-right: {_pinpad}% !important;
+        padding-right: 0 !important;
         justify-content: center !important;
-    }}
+    }
     </style>""",
     unsafe_allow_html=True,
 )

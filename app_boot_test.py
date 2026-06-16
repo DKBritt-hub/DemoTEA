@@ -25,7 +25,7 @@ def main():
     pinned = [k for k in cfg["_meta"].get("pinned_default", {}).get("keys", [])
               if k in levers]
     # each lever renders a group twin; pinned levers render a second (mirror) twin up top
-    expected_sliders = len(levers) + len(pinned) + 1  # +1: TEMP pin-tuning slider (remove when locked)
+    expected_sliders = len(levers) + len(pinned)
 
     at = AppTest.from_file(str(Path(__file__).resolve().parent / "streamlit_app.py"),
                            default_timeout=30)
