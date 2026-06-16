@@ -22,17 +22,19 @@ from publish import save_and_publish          # noqa: E402
 st.set_page_config(page_title="Demo Co. Membrane TEA", layout="wide",
                    initial_sidebar_state="expanded")
 
-# Nudge the pin (tack) button glyph left ~1/8 of the button width (halfway between the original
-# centre and the earlier over-correction). The emoji is centered in a stretched button; zeroing
-# left padding + 25% right padding recenters it at ~37.5% of the box width. Scoped to the tack
-# buttons only (their st-key-tack_* wrappers).
+# TEMP tuning knob: a slider to dial in the pin-glyph horizontal position live, then we lock the
+# value and remove this. The emoji is centered in a stretched button; right-padding shifts the
+# centered glyph LEFT (0% = original centre, 50% = far left). Scoped to the tack buttons only.
+_pinpad = st.sidebar.slider("🔧 Pin position (temp) — right-pad %", 0, 60, 25, 1,
+                            help="Drag until the pin icons look centred, tell me the value, then "
+                                 "it gets locked in and this slider is removed. Higher = further left.")
 st.markdown(
-    """<style>
-    div[class*="st-key-tack_"] button {
+    f"""<style>
+    div[class*="st-key-tack_"] button {{
         padding-left: 0 !important;
-        padding-right: 25% !important;
+        padding-right: {_pinpad}% !important;
         justify-content: center !important;
-    }
+    }}
     </style>""",
     unsafe_allow_html=True,
 )
