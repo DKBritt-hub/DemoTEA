@@ -50,7 +50,6 @@ dependency-light (engine is pure stdlib).
 **🟡 Yellow — allowed, but re-run the suite and eyeball the story.**
 - Change the **scale stages** or exponent `k` in `_meta.scale_stages` (this moves the
   pilot→commercial story — re-check with `python story_check.py`).
-- Change the **scenario presets** (`PRESETS` in `streamlit_app.py`).
 - **Re-freeze the regression anchor** (`ANCHOR` in `engine/run.py`) — only when you have
   *intentionally* changed the model and confirmed the new headline is correct.
 

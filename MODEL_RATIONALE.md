@@ -52,7 +52,10 @@ power) as `capacity^(k−1)` with **k = 0.5**, and scales annual volume by `capa
 full commercial.** The fixed cost bars visibly shrink across stages while the variable floor
 holds — that contrast is the lesson.
 
-## Scenario presets (the sensitivity story)
+## Sensitivity scenarios (set the sliders to these)
+
+The dashboard opens at the base case; drag the levers to reach the scenarios below (each
+flows through the real engine). `python story_check.py` prints them.
 
 - **Base case** — the table above.
 - **Path to profit** (faster line, higher uptime + yield, cheaper coating): profitable even at

@@ -60,18 +60,6 @@ PINNED_DEFAULT = [k for k in CFG["_meta"].get("pinned_default", {}).get("keys", 
 MINOR_KEYS = [k for k in CFG["_meta"].get("minor_factors", {}).get("keys", [])
               if k in LEVER_KEYS]
 
-# Scenario presets: snap the operating levers to tell the story (each flows through the real
-# engine -- presets only set slider values, they never fake an output). Keys absent from a
-# preset reset to their config default.
-PRESETS = {
-    "Base case (as-built)": {},
-    "Path to profit": {"web_speed": 32.0, "oee_availability": 0.85,
-                       "oee_quality": 0.96, "coat_material_price": 120.0},
-    "Downside": {"selling_price": 8.0, "oee_availability": 0.55,
-                 "coat_material_price": 190.0},
-}
-
-
 # Each lever's live value persists in a NON-widget canonical key `v_{key}` (survives a twin
 # not being rendered). Two twins may show one param: pinned mirror ("top") + its group ("grp").
 def _seed_state():
@@ -99,14 +87,6 @@ def _reset_values():
     for key in LEVER_KEYS:
         _, _, _, val = _slider_nums(PARAMS[key]["slider"], DEFAULTS[key])
         st.session_state[f"v_{key}"] = val
-
-
-def _apply_preset(name):
-    """Reset all levers to default, then apply the named preset's overrides."""
-    overrides = PRESETS[name]
-    for key in LEVER_KEYS:
-        _, _, _, val = _slider_nums(PARAMS[key]["slider"], DEFAULTS[key])
-        st.session_state[f"v_{key}"] = overrides.get(key, val)
 
 
 def _slider_row(key, suffix):
@@ -148,13 +128,6 @@ with st.sidebar:
                                 "costs per m² are scale-invariant and do not move.")
     _cap_x = next((s["capacity_x"] for s in _stage_list if s["name"] == _stage_name), 1)
     fixed_scale = float(_cap_x) ** (_exponent - 1.0)
-    st.divider()
-
-    st.markdown("### Scenarios")
-    st.caption("Snap the levers to a story; then drag to explore.")
-    for nm in PRESETS:
-        st.button(nm, key=f"preset_{nm}", width="stretch",
-                  on_click=_apply_preset, args=(nm,))
     st.divider()
 
     st.markdown("## Pinned levers")
@@ -244,13 +217,13 @@ st.plotly_chart(fig, width="stretch")
 
 # Per-bar formulas (hand-maintained to mirror engine/tea.py; per good m²).
 WF_FORMULAS = {
-    "Revenue": "Selling price ($/m²)",
-    "Materials": "(coating loading (g/m²) × coating price ($/kg) ÷ 1000 + substrate $/m²) ÷ yield",
-    "Labor": "FTEs × wage × (1 + burden) × paid h/yr ÷ good m²/yr × scale",
-    "Energy": "(baseline kW × h/yr × elec price ÷ good m²/yr × scale) + (kWh/m² × elec price ÷ yield)",
-    "Overhead": "fixed overhead ($/yr) ÷ good m²/yr × scale",
-    "Disposal": "scrap mass (kg/m²) × disposal ($/kg) ÷ yield",
-    "Margin": "Revenue − total cost",
+    "Revenue": r"Selling price (\$/m²)",
+    "Materials": r"(coating loading (g/m²) × coating price (\$/kg) ÷ 1000 + substrate \$/m²) ÷ yield",
+    "Labor": r"FTEs × wage × (1 + burden) × paid h/yr ÷ good m²/yr × scale",
+    "Energy": r"(baseline kW × h/yr × elec price ÷ good m²/yr × scale) + (kWh/m² × elec price ÷ yield)",
+    "Overhead": r"fixed overhead (\$/yr) ÷ good m²/yr × scale",
+    "Disposal": r"scrap mass (kg/m²) × disposal (\$/kg) ÷ yield",
+    "Margin": r"Revenue − total cost",
 }
 with st.expander("How each bar is computed", expanded=False):
     st.caption("Fixed costs (labor, overhead, baseline energy) carry the production-scale "

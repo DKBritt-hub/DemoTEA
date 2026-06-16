@@ -18,9 +18,9 @@ of auditable TEA + interactive dashboard we build for clients.
   volume, while the *variable* floor (coating materials, substrate, throughput energy) stays
   put. This drives the story: **near-breakeven at pilot → modestly profitable at small
   commercial → solidly profitable at full commercial.**
-- **Scenario presets** (Base case / Path to profit / Downside) that snap the levers to tell the
-  "improve X and you're profitable; let Y slip and you're not" story — each flows through the
-  real engine.
+- **Live sensitivity**: drag any lever to tell the "improve X and you're profitable; let Y
+  slip and you're not" story — every change flows through the real engine and updates the
+  waterfall and margin instantly.
 - Provenance tags on every parameter, an **editor mode** (the authorized write path we give
   client teams), and a **12-gate audit suite** that proves the model is internally consistent.
 
