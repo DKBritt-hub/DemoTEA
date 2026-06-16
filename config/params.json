@@ -1,0 +1,421 @@
+{
+  "_meta": {
+    "model": "Demo Co. R2R Filtration Membrane -- TEA (illustrative)",
+    "scope": "Public demonstration model of a roll-to-roll coated filtration-membrane line. ALL values are synthetic/illustrative -- this is a sales/promotional mock-up, not a real company's data. It shows the structure of the techno-economic model + dashboard we build for clients: a transparent layered engine, config-driven UI, provenance tags, an audit-gate suite, and a production-scale reframe that tells a pilot -> commercial profitability story.",
+    "created": "2026-06-15",
+    "schema_version": 1,
+    "notes": "Single source of truth for parameter metadata. Engine reads `value` only. The passworded edit-mode writes back value/min/max/step and appends a change_log entry per edit. category+tier drive UI grouping / clutter management. Demo data: every number is representative, none proprietary.",
+    "deliverable_basis": {
+      "_note": "Param VALUES are already the demo OPENING scenario (pilot scale). No separate validation anchor is overlaid (a public demo has no client spreadsheet to reproduce); the regression gate freezes the engine's own headline as a synthetic anchor. Left as an empty overlay so the model.py entry point is identical in shape to a real engagement build."
+    },
+    "pinned_default": {
+      "_note": "UI: param keys that open pinned to the dashboard's 'Pinned levers' zone -- the big top-line movers a prospect reasons in. Users pin/unpin freely (session); edit-mode 'set as default' persists a new list here.",
+      "keys": [
+        "web_speed",
+        "oee_availability",
+        "coat_material_price",
+        "fte_count",
+        "selling_price"
+      ]
+    },
+    "publish": {
+      "_note": "Editor-mode Save target. enabled=false -> Save persists to config + sanity-checks but does NOT git push. For the public demo this stays false; edits are session/local only.",
+      "enabled": false,
+      "remote": "origin",
+      "branch": "main"
+    },
+    "scale_stages": {
+      "_note": "Reframe VIEW control (NOT an edit-mode param): a qualitative production-scale selector that dilutes the FIXED cost-per-m2 stack (labor + overhead + baseline power) to approximate commercial scale-up, holding the scale-invariant VARIABLE stack (coating materials, substrate, throughput energy, disposal) fixed. fixed-cost-per-m2 scales as capacity_x^(exponent-1); displayed annual volume scales as capacity_x. exponent ~0.5 sits near the classic six-tenths capital rule. Approximation by design; credits ONLY fixed dilution -- variable improvements at scale (cheaper materials, OEE maturity) are deliberately left as unmodeled upside.",
+      "exponent": 0.5,
+      "stages": [
+        {
+          "name": "Pilot",
+          "capacity_x": 1
+        },
+        {
+          "name": "Small commercial",
+          "capacity_x": 5
+        },
+        {
+          "name": "Full commercial",
+          "capacity_x": 50
+        }
+      ]
+    },
+    "minor_factors": {
+      "_note": "UI: low-salience levers collected into one 'Minor factors' expander at the bottom rather than their themed group, to reduce clutter. They remain fully live in the engine.",
+      "keys": [
+        "roll_length",
+        "operating_hours_per_day",
+        "operating_days_per_year",
+        "labor_overhead",
+        "fixed_power_kw",
+        "disposal_rate"
+      ]
+    },
+    "hidden_factors": {
+      "_note": "UI: levers with negligible headline impact -- removed from the dashboard entirely while remaining in config at their default value. None for this demo.",
+      "keys": []
+    },
+    "status_vocab": {
+      "confirmed": "Locked by client",
+      "client-provided": "Given by client; not independently grounded yet",
+      "estimate": "Our estimate, grounded by stated logic / public benchmark",
+      "constant": "Physical constant or fixed modeling convention",
+      "TBD": "Not yet known",
+      "illustrative": "Synthetic value chosen for this public demo; representative, not a real company's data"
+    },
+    "tier_vocab": {
+      "high": "Materially moves the headline; surface in UI by default",
+      "medium": "Noticeable; surface",
+      "low": "Minor; collapsible",
+      "negligible": "Near-zero effect; hide by default",
+      "fixed": "Structural/numerical; not a user slider"
+    }
+  },
+  "params": {
+    "web_speed": {
+      "label": "Line speed",
+      "value": 20,
+      "unit": "m/h",
+      "status": "illustrative",
+      "category": "Process basis",
+      "tier": "high",
+      "slider": {
+        "min": 4,
+        "max": 60,
+        "step": 1,
+        "hard_min": 0.5
+      },
+      "source": "Illustrative -- representative R2R coating line speeds",
+      "notes": "Web/line speed. With coating width it sets the area throughput rate (m2/h). A top demo lever: a faster line spreads fixed costs over more m2.",
+      "change_log": []
+    },
+    "web_width": {
+      "label": "Coating width",
+      "value": 1.2,
+      "unit": "m",
+      "status": "illustrative",
+      "category": "Process basis",
+      "tier": "medium",
+      "slider": {
+        "min": 0.3,
+        "max": 2.5,
+        "step": 0.1
+      },
+      "source": "Illustrative -- representative R2R web width",
+      "notes": "Coated web width. With line speed sets area throughput (area_rate = speed x width).",
+      "change_log": []
+    },
+    "roll_length": {
+      "label": "Roll length",
+      "value": 500,
+      "unit": "m",
+      "status": "illustrative",
+      "category": "Process basis",
+      "tier": "low",
+      "slider": {
+        "min": 100,
+        "max": 2000,
+        "step": 50
+      },
+      "source": "Illustrative -- batch/roll definition",
+      "notes": "Roll definition used for per-roll material accounting; cancels out of per-m2 economics (a minor factor).",
+      "change_log": []
+    },
+    "operating_hours_per_day": {
+      "label": "Operating hours/day",
+      "value": 24,
+      "unit": "h/day",
+      "status": "estimate",
+      "category": "Process basis",
+      "tier": "low",
+      "slider": {
+        "min": 8,
+        "max": 24,
+        "step": 1
+      },
+      "source": "Estimate -- continuous (3-shift) R2R operation",
+      "notes": "Scheduled run hours per day. Continuous operation assumed at the demo opening point.",
+      "change_log": []
+    },
+    "operating_days_per_year": {
+      "label": "Operating days/year",
+      "value": 340,
+      "unit": "day/yr",
+      "status": "estimate",
+      "category": "Process basis",
+      "tier": "low",
+      "slider": {
+        "min": 200,
+        "max": 360,
+        "step": 5
+      },
+      "source": "Estimate -- nameplate calendar net of planned maintenance",
+      "notes": "Operating days/year; ~340 leaves room for planned maintenance/holiday downtime.",
+      "change_log": []
+    },
+    "oee_availability": {
+      "label": "Uptime (availability)",
+      "value": 0.70,
+      "unit": "fraction",
+      "status": "estimate",
+      "category": "Throughput & yield",
+      "tier": "high",
+      "slider": {
+        "min": 0.4,
+        "max": 0.95,
+        "step": 0.01
+      },
+      "source": "Estimate -- pilot-line uptime benchmark",
+      "notes": "Fraction of scheduled hours the line actually runs. Pilot lines often 0.5-0.8; maturing to commercial lifts it. A headline demo lever.",
+      "change_log": []
+    },
+    "oee_quality": {
+      "label": "First-pass yield (quality)",
+      "value": 0.90,
+      "unit": "fraction",
+      "status": "estimate",
+      "category": "Throughput & yield",
+      "tier": "medium",
+      "slider": {
+        "min": 0.6,
+        "max": 0.99,
+        "step": 0.01
+      },
+      "source": "Estimate -- coated-web first-pass yield",
+      "notes": "Good (sellable) area / produced area. Scrap (1 - yield) consumed materials but is not sold, so it hits both cost and revenue.",
+      "change_log": []
+    },
+    "oee_performance": {
+      "label": "Performance factor",
+      "value": 0.95,
+      "unit": "fraction",
+      "status": "constant",
+      "category": "Throughput & yield",
+      "tier": "fixed",
+      "slider": null,
+      "source": "Modeling convention -- speed/minor-stop loss held constant",
+      "notes": "OEE performance component; held constant for the demo to keep the throughput story to two intuitive levers (uptime + yield).",
+      "change_log": []
+    },
+    "coat_loading": {
+      "label": "Coating loading",
+      "value": 25,
+      "unit": "g/m2",
+      "status": "illustrative",
+      "category": "Coating materials",
+      "tier": "medium",
+      "slider": {
+        "min": 5,
+        "max": 50,
+        "step": 1
+      },
+      "source": "Illustrative -- dry areal coating mass",
+      "notes": "Dry functional coating laid down per m2. Single source of truth for coating mass: drives both coating material cost and the mass balance (perturbing it must move both -- the consistency gate checks this).",
+      "change_log": []
+    },
+    "coat_material_price": {
+      "label": "Coating material price",
+      "value": 140,
+      "unit": "$/kg",
+      "status": "illustrative",
+      "category": "Coating materials",
+      "tier": "high",
+      "slider": {
+        "min": 20,
+        "max": 300,
+        "step": 5
+      },
+      "source": "Illustrative -- blended functional-formulation price",
+      "notes": "Blended price of the coating formulation (active + binder + additives). With loading sets coating material $/m2. A top demo lever.",
+      "change_log": []
+    },
+    "substrate_cost": {
+      "label": "Substrate cost",
+      "value": 2.2,
+      "unit": "$/m2",
+      "status": "estimate",
+      "category": "Coating materials",
+      "tier": "medium",
+      "slider": {
+        "min": 0.2,
+        "max": 6.0,
+        "step": 0.1
+      },
+      "source": "Estimate -- support web purchased per m2",
+      "notes": "Support web / substrate cost per m2 (priced per area, as substrates are bought).",
+      "change_log": []
+    },
+    "substrate_areal": {
+      "label": "Substrate areal mass",
+      "value": 90,
+      "unit": "g/m2",
+      "status": "constant",
+      "category": "Coating materials",
+      "tier": "fixed",
+      "slider": null,
+      "source": "Modeling convention -- substrate areal mass",
+      "notes": "Substrate areal mass; used only to close the mass balance (in == product + waste). Not a cost lever (substrate is costed per m2).",
+      "change_log": []
+    },
+    "fte_count": {
+      "label": "Headcount (FTEs)",
+      "value": 4,
+      "unit": "FTE",
+      "status": "illustrative",
+      "category": "Labor",
+      "tier": "high",
+      "slider": {
+        "min": 1,
+        "max": 40,
+        "step": 1
+      },
+      "source": "Illustrative -- line crew across all shifts",
+      "notes": "Full-time-equivalent headcount running the line across shifts. Fixed annual cost amortized over annual good m2 -- dilutes with scale. The 'every business has labor' lever.",
+      "change_log": []
+    },
+    "wage": {
+      "label": "Loaded wage",
+      "value": 30,
+      "unit": "$/h",
+      "status": "estimate",
+      "category": "Labor",
+      "tier": "medium",
+      "slider": {
+        "min": 18,
+        "max": 60,
+        "step": 1
+      },
+      "source": "Estimate -- US manufacturing operator wage benchmark",
+      "notes": "Base hourly wage before benefits/burden (see labor overhead).",
+      "change_log": []
+    },
+    "labor_overhead": {
+      "label": "Labor overhead (burden)",
+      "value": 0.30,
+      "unit": "fraction",
+      "status": "estimate",
+      "category": "Labor",
+      "tier": "low",
+      "slider": {
+        "min": 0.1,
+        "max": 0.6,
+        "step": 0.05
+      },
+      "source": "Estimate -- benefits/burden multiplier",
+      "notes": "Benefits + payroll burden applied on top of base wage.",
+      "change_log": []
+    },
+    "fte_hours_per_year": {
+      "label": "Paid hours per FTE-year",
+      "value": 2080,
+      "unit": "h/yr",
+      "status": "constant",
+      "category": "Labor",
+      "tier": "fixed",
+      "slider": null,
+      "source": "Standard -- 40 h/wk x 52 wk",
+      "notes": "Paid hours per FTE per year (standard).",
+      "change_log": []
+    },
+    "electricity_price": {
+      "label": "Electricity price",
+      "value": 0.11,
+      "unit": "$/kWh",
+      "status": "estimate",
+      "category": "Energy",
+      "tier": "medium",
+      "slider": {
+        "min": 0.05,
+        "max": 0.30,
+        "step": 0.01
+      },
+      "source": "Estimate -- US industrial electricity ~$0.08-0.15/kWh",
+      "notes": "Industrial electricity rate; applies to both baseline and throughput energy.",
+      "change_log": []
+    },
+    "energy_intensity": {
+      "label": "Process energy intensity",
+      "value": 1.0,
+      "unit": "kWh/m2",
+      "status": "illustrative",
+      "category": "Energy",
+      "tier": "medium",
+      "slider": {
+        "min": 0.1,
+        "max": 4.0,
+        "step": 0.1
+      },
+      "source": "Illustrative -- drying/curing energy per m2",
+      "notes": "Throughput-linked process energy per m2 (drying/curing ovens). Scale-invariant per m2 (a variable cost).",
+      "change_log": []
+    },
+    "fixed_power_kw": {
+      "label": "Baseline power",
+      "value": 25,
+      "unit": "kW",
+      "status": "illustrative",
+      "category": "Energy",
+      "tier": "low",
+      "slider": {
+        "min": 0,
+        "max": 150,
+        "step": 5,
+        "hard_min": 0
+      },
+      "source": "Illustrative -- facility/HVAC baseline load",
+      "notes": "Baseline facility power independent of throughput (HVAC, controls). A fixed cost -> dilutes with scale.",
+      "change_log": []
+    },
+    "overhead_annual": {
+      "label": "Fixed overhead (annual)",
+      "value": 130000,
+      "unit": "$/yr",
+      "status": "estimate",
+      "category": "Overhead",
+      "tier": "medium",
+      "slider": {
+        "min": 20000,
+        "max": 1000000,
+        "step": 10000
+      },
+      "source": "Estimate -- lumped facility + G&A + insurance",
+      "notes": "Lumped annual fixed overhead (rent, G&A, insurance). Amortized over annual good m2 -> dilutes with scale.",
+      "change_log": []
+    },
+    "disposal_rate": {
+      "label": "Disposal cost",
+      "value": 0.5,
+      "unit": "$/kg",
+      "status": "estimate",
+      "category": "Waste",
+      "tier": "low",
+      "slider": {
+        "min": 0,
+        "max": 5,
+        "step": 0.1,
+        "hard_min": 0
+      },
+      "source": "Estimate -- solid-waste disposal",
+      "notes": "Disposal cost for scrap + trim solids (coating + substrate not sold).",
+      "change_log": []
+    },
+    "selling_price": {
+      "label": "Selling price",
+      "value": 10.0,
+      "unit": "$/m2",
+      "status": "illustrative",
+      "category": "Revenue",
+      "tier": "high",
+      "slider": {
+        "min": 2.0,
+        "max": 40.0,
+        "step": 0.5
+      },
+      "source": "Illustrative -- membrane sells per m2",
+      "notes": "Membrane selling price per m2. Set to land the demo story (near-breakeven at pilot). A headline demo lever.",
+      "change_log": []
+    }
+  }
+}

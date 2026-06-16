@@ -1,0 +1,4 @@
+# Demo Co. Membrane TEA dashboard — deploy deps (Streamlit Cloud reads this).
+# The engine + audit gates are pure-stdlib Python; only the dashboard needs these.
+streamlit>=1.40
+plotly>=5.22

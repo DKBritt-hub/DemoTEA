@@ -1,0 +1,6 @@
+# Never commit secrets (Streamlit passwords live in the Cloud secrets manager only)
+.streamlit/secrets.toml
+
+__pycache__/
+*.pyc
+*.json.tmp
