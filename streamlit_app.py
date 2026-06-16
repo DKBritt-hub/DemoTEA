@@ -22,14 +22,15 @@ from publish import save_and_publish          # noqa: E402
 st.set_page_config(page_title="Demo Co. Membrane TEA", layout="wide",
                    initial_sidebar_state="expanded")
 
-# Nudge the pin (tack) button glyph left ~1/4 of the button width. The emoji is centered in a
-# stretched button and reads as off-centre; zeroing left padding + 50% right padding recenters
-# it at ~25% of the box width. Scoped to the tack buttons only (their st-key-tack_* wrappers).
+# Nudge the pin (tack) button glyph left ~1/8 of the button width (halfway between the original
+# centre and the earlier over-correction). The emoji is centered in a stretched button; zeroing
+# left padding + 25% right padding recenters it at ~37.5% of the box width. Scoped to the tack
+# buttons only (their st-key-tack_* wrappers).
 st.markdown(
     """<style>
     div[class*="st-key-tack_"] button {
         padding-left: 0 !important;
-        padding-right: 50% !important;
+        padding-right: 25% !important;
         justify-content: center !important;
     }
     </style>""",
