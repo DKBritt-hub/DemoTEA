@@ -8,6 +8,7 @@ SAME audited engine the gate suite checks; it never recomputes (audit gate 4).
 Run locally:  streamlit run streamlit_app.py
 Deploy:       push to GitHub, connect at share.streamlit.io, main file streamlit_app.py
 """
+import math
 import sys
 from pathlib import Path
 
@@ -247,6 +248,84 @@ with st.expander("How each bar is computed", expanded=False):
         f = WF_FORMULAS.get(lbl)
         if f:
             st.markdown(f"**{lbl}** — {f}")
+
+
+# -- Sensitivity tornado (per m²) --------------------------------------------------
+# One-at-a-time sweep: hold the current scenario fixed, swing each lever across its FULL
+# slider range, and measure the resulting spread in the chosen headline. Each bar end is
+# computed by RE-RUNNING the same engine (dashboard_view) at the perturbed input -- a
+# difference of engine outputs, not UI arithmetic, so UI<->engine parity (gate 4) holds.
+st.divider()
+st.markdown("## Sensitivity — tornado")
+_metric_opts = {"Margin $/m²": "margin_per_m2", "Cost $/m²": "cost_per_m2"}
+_tm_label = st.radio(
+    "Headline to test", list(_metric_opts), horizontal=True, key="tornado_metric",
+    help="Each lever is swung across its full slider range while every other lever stays "
+         "at the current scenario; bars show the resulting spread in the headline.")
+_metric_key = _metric_opts[_tm_label]
+_base_val = c[_metric_key]
+
+_rows = []
+for key in LEVER_KEYS:
+    lo, hi, _, _ = _slider_nums(PARAMS[key]["slider"], DEFAULTS[key])
+    if lo == hi:
+        continue
+    try:
+        q_lo = dict(P)
+        q_lo[key] = lo
+        q_hi = dict(P)
+        q_hi[key] = hi
+        v_lo = dashboard_view(q_lo, CFG)["cards"][_metric_key]
+        v_hi = dashboard_view(q_hi, CFG)["cards"][_metric_key]
+    except Exception:                          # noqa: BLE001 - a singular extreme drops the lever
+        continue
+    if not (math.isfinite(v_lo) and math.isfinite(v_hi)):
+        continue
+    _rows.append((PARAMS[key]["label"], PARAMS[key]["unit"], lo, hi, v_lo, v_hi,
+                  abs(v_hi - v_lo)))
+
+TOP_N = 10
+_rows.sort(key=lambda r: r[6], reverse=True)
+_shown = list(reversed(_rows[:TOP_N]))         # largest swing drawn at the top
+
+if not _shown:
+    st.caption("_No finite-range levers to plot at the current scenario._")
+else:
+    y = [r[0] for r in _shown]
+    base_arr = [_base_val] * len(_shown)
+    lo_delta = [r[4] - _base_val for r in _shown]
+    hi_delta = [r[5] - _base_val for r in _shown]
+
+    tor = go.Figure()
+    tor.add_bar(orientation="h", y=y, x=lo_delta, base=base_arr,
+                name="lever at range low", marker_color="#2c7fb8",
+                customdata=[r[4] for r in _shown],
+                hovertemplate="%{y}<br>low end → %{customdata:.2f} $/m²<extra></extra>")
+    tor.add_bar(orientation="h", y=y, x=hi_delta, base=base_arr,
+                name="lever at range high", marker_color="#f08a24",
+                customdata=[r[5] for r in _shown],
+                hovertemplate="%{y}<br>high end → %{customdata:.2f} $/m²<extra></extra>")
+    tor.add_vline(x=_base_val, line=dict(color="#555", width=1.5, dash="dot"))
+    tor.update_layout(
+        barmode="overlay", bargap=0.35, height=max(300, 40 * len(_shown) + 130),
+        margin=dict(l=10, r=20, t=10, b=40),
+        xaxis=dict(title=dict(text=f"{_tm_label}   (base = {_fmt_usd(_base_val)})",
+                              font=dict(size=11)),
+                   gridcolor="#eee", zeroline=False),
+        yaxis=dict(automargin=True),
+        legend=dict(orientation="h", yanchor="bottom", y=1.0, x=0, font=dict(size=11)),
+        plot_bgcolor="white", paper_bgcolor="white",
+    )
+    st.plotly_chart(tor, width="stretch")
+
+    _dropped = len(_rows) - len(_shown)
+    cap = (f"Levers ranked by how far they move **{_tm_label}** across their full slider "
+           f"range, holding all other levers at the current scenario. The dotted line is "
+           f"the current value ({_fmt_usd(_base_val)}).")
+    if _dropped > 0:
+        cap += (f" Showing the {len(_shown)} biggest movers of {len(_rows)}; "
+                f"{_dropped} smaller-impact levers omitted.")
+    st.caption(cap)
 
 
 # -- Editor mode -------------------------------------------------------------------
