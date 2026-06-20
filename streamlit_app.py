@@ -318,15 +318,6 @@ else:
     )
     st.plotly_chart(tor, width="stretch")
 
-    _dropped = len(_rows) - len(_shown)
-    cap = (f"Levers ranked by how far they move **{_tm_label}** across their full slider "
-           f"range, holding all other levers at the current scenario. The dotted line is "
-           f"the current value ({_fmt_usd(_base_val)}).")
-    if _dropped > 0:
-        cap += (f" Showing the {len(_shown)} biggest movers of {len(_rows)}; "
-                f"{_dropped} smaller-impact levers omitted.")
-    st.caption(cap)
-
 
 # -- Editor mode -------------------------------------------------------------------
 # Open viewer app; the WRITE feature stays gated by a separate editor password (set only in
